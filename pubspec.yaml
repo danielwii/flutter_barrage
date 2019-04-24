@@ -1,8 +1,8 @@
 name: flutter_barrage
 description: A new barrage package project.
 version: 0.0.1
-author:
-homepage:
+author: Daniel Wei <danielwii0326@gmail.com>
+homepage: https://github.com/danielwii/flutter_barrage.git
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
