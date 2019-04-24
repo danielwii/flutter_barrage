@@ -166,6 +166,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 typedef int KeyCalculator<T>(T t);
 
 class HashList<T> {
+  /// key is the showTime in minutes
   Map<int, TreeSet<T>> _map = new HashMap();
   final Comparator<T> comparator;
   final KeyCalculator<T> keyCalculator;
