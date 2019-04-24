@@ -58,7 +58,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     bullets.forEach((Bullet bullet) {
       AnimationController controller;
 
-      controller = AnimationController(duration: Duration(seconds: widget.speed ?? 5), vsync: this);
+      controller = AnimationController(
+          duration: Duration(seconds: widget.speed ?? 5), vsync: this);
       Animation<double> animation =
           new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
@@ -140,7 +141,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         children: <Widget>[
           widget.debug
               ? Container(
-                  decoration: BoxDecoration(color: Colors.lightGreenAccent.withOpacity(0.8)),
+                  decoration: BoxDecoration(
+                      color: Colors.lightGreenAccent.withOpacity(0.8)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -151,7 +153,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
                           style: Theme.of(context).textTheme.title),
                       Text('Timeline: ${_controller.timeline}',
                           style: Theme.of(context).textTheme.title),
-                      Text('Bullets: ${_widgets.length}', style: Theme.of(context).textTheme.title),
+                      Text('Bullets: ${_widgets.length}',
+                          style: Theme.of(context).textTheme.title),
                     ],
                   ),
                 )
@@ -179,7 +182,8 @@ class HashList<T> {
       if (_map.containsKey(key)) {
         _map[key].add(value);
       } else {
-        _map.putIfAbsent(key, () => TreeSet<T>(comparator: comparator)..add(value));
+        _map.putIfAbsent(
+            key, () => TreeSet<T>(comparator: comparator)..add(value));
       }
     });
   }
@@ -196,8 +200,9 @@ class BarrageValue {
 
   BarrageValue({this.timeline = -1, this.isPlaying = false});
 
-  BarrageValue copyWith({int timeline, bool isPlaying}) =>
-      BarrageValue(timeline: timeline ?? this.timeline, isPlaying: isPlaying ?? this.isPlaying);
+  BarrageValue copyWith({int timeline, bool isPlaying}) => BarrageValue(
+      timeline: timeline ?? this.timeline,
+      isPlaying: isPlaying ?? this.isPlaying);
 
   @override
   String toString() {
@@ -214,9 +219,9 @@ class BarrageWallValue {
 
   BarrageWallValue.fromList(List<Bullet> bullets,
       {this.showedTimeBefore = 0, this.waitingList = const []})
-      : bullets =
-            HashList<Bullet>(keyCalculator: (t) => Duration(milliseconds: t.showTime).inMinutes)
-              ..appendByMinutes(bullets),
+      : bullets = HashList<Bullet>(
+            keyCalculator: (t) => Duration(milliseconds: t.showTime).inMinutes)
+          ..appendByMinutes(bullets),
         size = bullets.length,
         processedSize = 0;
 
@@ -254,7 +259,8 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
   bool _isDisposed = false;
   int timeline = 0;
 
-  BarrageWallController({ValueNotifier<BarrageWallValue> barrageNotifier, this.timelineNotifier})
+  BarrageWallController(
+      {ValueNotifier<BarrageWallValue> barrageNotifier, this.timelineNotifier})
       : barrageNotifier = barrageNotifier ?? ValueNotifier(BarrageWallValue()),
         super(BarrageWallValue.fromList([]));
 
@@ -267,7 +273,8 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
     final Completer<void> initializingCompleter = Completer<void>();
 
     if (timelineNotifier == null) {
-      _timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) async {
+      _timer = Timer.periodic(const Duration(milliseconds: 100),
+          (Timer timer) async {
         if (_isDisposed) {
           timer.cancel();
           return;
@@ -300,7 +307,8 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
 
     if (exists) {
       final toBePrecessed = value.bullets._map[key].where((barrage) {
-        return barrage.showTime > value.showedTimeBefore && barrage.showTime <= timeline;
+        return barrage.showTime > value.showedTimeBefore &&
+            barrage.showTime <= timeline;
       }).toList(growable: false);
 
       if (toBePrecessed.isNotEmpty) {
