@@ -1,0 +1,16 @@
+name: flutter_barrage_example
+description: An example project for flutter_barrage.
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_barrage:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

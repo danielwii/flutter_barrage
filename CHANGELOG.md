@@ -1,3 +1,7 @@
-## [0.0.1] - 2019/04/24
+## 0.1.0
 
-* init
+* Add example
+
+## 0.0.1
+
+* Initial first release

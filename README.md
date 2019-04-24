@@ -18,10 +18,10 @@ Stack(
       height:
           MediaQuery.of(context).size.width * MediaQuery.of(context).size.aspectRatio + 200,
       child: BarrageWall(
-          timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline
-          bullets: bullets,
-          child: new Container(),
-        );
+        timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline
+        bullets: bullets,
+        child: new Container(),
+      ),
     )
   ],
 );
