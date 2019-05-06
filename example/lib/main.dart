@@ -16,6 +16,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+final barrageWallController = BarrageWallController();
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -31,29 +33,48 @@ class _MyHomePageState extends State<MyHomePage> {
     Random random = new Random();
     List<Bullet> bullets = List<Bullet>.generate(100, (i) {
       final showTime = random.nextInt(60000); // in 60s
-      return Bullet(child: Text('$i-$showTime}'), showTime: showTime);
+      return Bullet(child: Text('$i-$showTime'), showTime: showTime);
     });
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: <Widget>[
-            Positioned(
-              top: 200,
-              width: MediaQuery.of(context).size.width,
-              height:
-                  MediaQuery.of(context).size.width * MediaQuery.of(context).size.aspectRatio + 200,
-              child: BarrageWall(
-                debug: true,
-                /*
-                  timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
-                bullets: bullets,
-                child: new Container(),
+            Expanded(
+              flex: 9,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+//                    top: 20,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width *
+                            MediaQuery.of(context).size.aspectRatio +
+                        100,
+                    child: BarrageWall(
+                      debug: true,
+                      /*
+                        timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
+                      bullets: bullets,
+                      child: new Container(),
+                      controller: barrageWallController,
+                    ),
+                  ),
+                ],
               ),
-            )
+            ),
+            Expanded(
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+//                    controller: textEditingController,
+                      maxLength: 20,
+                      onSubmitted: (text) {
+//                      textEditingController.clear();
+                        barrageWallController.send([new Bullet(child: Text(text))]);
+                      })),
+            ),
           ],
         ),
       ),
