@@ -336,7 +336,7 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
       _timer?.cancel();
     }
     _isDisposed = true;
-    timelineNotifier.removeListener(_handleTimelineNotifier);
+    timelineNotifier?.removeListener(_handleTimelineNotifier);
     barrageNotifier.dispose();
     super.dispose();
   }
