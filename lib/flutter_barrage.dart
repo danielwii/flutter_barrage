@@ -20,7 +20,7 @@ class BarrageWall extends StatefulWidget {
     BarrageWallController controller,
     ValueNotifier<BarrageWallValue> barrageNotifier,
     ValueNotifier<BarrageValue> timelineNotifier,
-    this.speed = 8,
+    this.speed = 4,
     this.child,
     this.width,
     this.height,
@@ -64,7 +64,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     bullets.forEach((Bullet bullet) {
       AnimationController controller;
 
-      controller = AnimationController(duration: Duration(seconds: widget.speed ?? 5), vsync: this);
+      controller =
+          AnimationController(duration: Duration(seconds: (widget.speed ?? 5) * 2), vsync: this);
       Animation<double> animation =
           new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
