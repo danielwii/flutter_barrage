@@ -9,10 +9,23 @@ import 'package:quiver/collection.dart';
 
 class BarrageWall extends StatefulWidget {
   final BarrageWallController controller;
+
+  /// the bullet widget
   final Widget child;
+
+  /// time in seconds of bullet show in screen
   final int speed;
+
   final double width;
   final double height;
+
+  /// disable by default, will overwrite other bullets
+  final bool massiveMode;
+
+  /// used to make barrage tidy
+  final double maxBulletHeight;
+
+  /// enable debug mode, will display a debug panel with information
   final bool debug;
 
   BarrageWall({
@@ -20,10 +33,12 @@ class BarrageWall extends StatefulWidget {
     BarrageWallController controller,
     ValueNotifier<BarrageWallValue> barrageNotifier,
     ValueNotifier<BarrageValue> timelineNotifier,
-    this.speed = 4,
+    this.speed,
     this.child,
     this.width,
     this.height,
+    this.massiveMode,
+    this.maxBulletHeight,
     this.debug = false,
   }) : controller = controller ??
             BarrageWallController.withBarrages(
@@ -32,7 +47,8 @@ class BarrageWall extends StatefulWidget {
               timelineNotifier: timelineNotifier,
             ) {
     if (controller != null) {
-      this.controller.value = controller.value ?? BarrageWallValue.fromList(bullets ?? []);
+      this.controller.value =
+          controller.value.size == 0 ? BarrageWallValue.fromList(bullets ?? []) : controller.value;
       this.controller.barrageNotifier = controller.barrageNotifier ?? barrageNotifier;
       this.controller.timelineNotifier = controller.timelineNotifier ?? timelineNotifier;
     }
@@ -40,6 +56,39 @@ class BarrageWall extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _BarrageState();
+}
+
+class BulletPos {
+  int id;
+  double position;
+  double width;
+  bool released = false;
+  int lifetime;
+
+  BulletPos({this.id, this.position, this.width})
+      : lifetime = DateTime.now().millisecondsSinceEpoch;
+
+  updateWith({int id, double position, double width = 0}) {
+    if (id == this.id) {
+      this.position = position;
+      this.width = width > 0 ? width : this.width;
+    } else {
+      if (this.position > position) {
+        this.id = id;
+        this.position = position;
+        this.width = width > 0 ? width : this.width;
+        this.released = false;
+        this.lifetime = DateTime.now().millisecondsSinceEpoch;
+      }
+    }
+  }
+
+  bool get hasExtraSpace => position > width + 8;
+
+  @override
+  String toString() {
+    return 'BulletPos{id: $id, position: $position, width: $width, released: $released}';
+  }
 }
 
 class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
@@ -51,16 +100,66 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   double _height;
   Timer _cleaner;
 
-  animationCleaner(AnimationStatus status) {}
+  int _maxBulletHeight;
+  int _usedChannel = 0;
+  int _totalChannels;
+  int _channelMask;
+  Map<dynamic, BulletPos> _lastBullets = {};
+
+  int _calcSafeHeight(double height) =>
+      height.isInfinite ? context.size.height.toInt() : height.toInt() - 80;
+
+  /// null means no available channels exists
+  int _nextChannel() {
+    final _randomSeed = _totalChannels - 1;
+
+    if (_usedChannel ^ _channelMask == 0) {
+      return null;
+    }
+
+    var times = 1;
+    var channel = _random.nextInt(_randomSeed);
+    var channelCode = 1 << channel;
+
+    while (_usedChannel & channelCode != 0 && _usedChannel ^ _channelMask != 0) {
+      times++;
+      channel = channel >= _totalChannels ? 0 : channel + 1;
+      channelCode = 1 << channel;
+
+      /// return random channel if no channels available and massive mode is enabled
+      if (times > _totalChannels) {
+        if (widget.massiveMode == true) {
+          return _random.nextInt(_randomSeed);
+        }
+        return null;
+      }
+    }
+    _usedChannel |= (1 << channel);
+    return channel;
+  }
+
+  _releaseChannels() {
+    for (int i = 0; i < _lastBullets.length; i++) {
+      final channel = _lastBullets.keys.elementAt(i);
+      var isNotReleased = !_lastBullets[channel].released;
+      var liveTooLong = false; // now - _lastBullets[channel].lifetime > 3000;
+      if (liveTooLong || (isNotReleased && _lastBullets[channel].hasExtraSpace)) {
+        _lastBullets[channel].released = true;
+        _usedChannel &= _channelMask ^ 1 << channel;
+      }
+    }
+  }
 
   void _handleBullets(
     BuildContext context, {
     List<Bullet> bullets,
     double width,
-    double height,
+    @deprecated double height,
     double end,
   }) {
+    // cannot get the width of widget when not rendered, make a twice longer width for now
     end ??= width * 2;
+
     bullets.forEach((Bullet bullet) {
       AnimationController controller;
 
@@ -69,14 +168,58 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       Animation<double> animation =
           new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
-      final top = _random.nextInt(height.toInt()).toDouble();
+      _releaseChannels();
+      final nextChannel = _nextChannel();
+      if (nextChannel != null) {}
+
+      /// discard bullets do not have available channel and massive mode is not enabled too
+      if (nextChannel == null) {
+        return;
+      }
+
+      final channelHeightPos = nextChannel * _maxBulletHeight;
+
+      /// make bullets not showed up in same time
       final fixedWidth = width + _random.nextInt(20).toDouble();
       final bulletWidget = AnimatedBuilder(
         animation: animation,
         child: bullet.child,
         builder: (BuildContext context, Widget child) {
+          var widgetWidth = 0.0;
+          if (animation.isCompleted) {
+            return const SizedBox();
+          }
+
+          if (context.findRenderObject() != null) {
+            final RenderBox box = context.findRenderObject();
+
+            if (box != null && RenderObject.debugActiveLayout == null) {
+              widgetWidth = box?.size?.width;
+            }
+
+            if (box != null &&
+                RenderObject.debugActiveLayout == null &&
+                animation.value > (fixedWidth + widgetWidth)) {
+              return const SizedBox();
+            }
+          }
+
+          final widthPos = fixedWidth - animation.value;
+
+          _releaseChannels();
+          if (!_lastBullets.containsKey(nextChannel)) {
+            _lastBullets[nextChannel] =
+                BulletPos(id: context.hashCode, position: animation.value, width: widgetWidth);
+          }
+
+          _lastBullets[nextChannel]?.updateWith(
+            id: context.hashCode,
+            position: animation.value,
+            width: widgetWidth,
+          );
+
           return Transform.translate(
-            offset: Offset(fixedWidth - animation.value, top),
+            offset: Offset(widthPos, channelHeightPos.toDouble()),
             child: child,
           );
         },
@@ -97,6 +240,16 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
   void handleBullets() {
     if (_processed != _controller.barrageNotifier.value.processedSize) {
+      if (_width == null || _height == null) {
+        return;
+      }
+
+      if (_totalChannels == null) {
+        _maxBulletHeight = widget.maxBulletHeight ?? 16;
+        _totalChannels = _calcSafeHeight(_height) ~/ _maxBulletHeight;
+        _channelMask = (2 << _totalChannels) - 1;
+      }
+
       _handleBullets(
         context,
         bullets: _controller.barrageNotifier.value.waitingList,
@@ -115,6 +268,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
     _controller.barrageNotifier.addListener(handleBullets);
 
+    /*
     _cleaner = Timer.periodic(Duration(seconds: 10), (timer) {
       _widgets.removeWhere((controller, widget) {
         if (controller.isCompleted) {
@@ -123,7 +277,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         }
         return false;
       });
-    });
+    });*/
 
     super.initState();
   }
@@ -139,8 +293,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (_, snapshot) {
-      if (widget.width == null) _width = widget.width ?? snapshot.maxWidth;
-      if (widget.height == null) _height = widget.height ?? snapshot.maxHeight;
+      if (_width == null) _width = widget.width ?? snapshot.maxWidth;
+      if (_height == null) _height = widget.height ?? snapshot.maxHeight;
 
       return Stack(
         fit: StackFit.loose,
@@ -152,13 +306,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text('${_controller.barrageNotifier.value}',
-                          style: Theme.of(context).textTheme.title),
-                      Text('${_controller.timelineNotifier?.value}',
-                          style: Theme.of(context).textTheme.title),
-                      Text('Timeline: ${_controller.timeline}',
-                          style: Theme.of(context).textTheme.title),
-                      Text('Bullets: ${_widgets.length}', style: Theme.of(context).textTheme.title),
+                      Text('BarrageNotifier: ${_controller.barrageNotifier.value}'),
+                      Text('TimelineNotifier: ${_controller.timelineNotifier?.value}'),
+                      Text('Timeline: ${_controller.timeline}'),
+                      Text('Bullets: ${_widgets.length}'),
+                      Text('UsedChannels: ${_usedChannel.toRadixString(2)}'),
                     ],
                   ),
                 )
