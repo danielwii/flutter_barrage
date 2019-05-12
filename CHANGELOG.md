@@ -1,3 +1,7 @@
+## 0.3.0
+
+* add massive mode
+
 ## 0.2.0+1
 
 * fix timelineNotifier may be null issue
