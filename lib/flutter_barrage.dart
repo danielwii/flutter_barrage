@@ -27,6 +27,7 @@ class BarrageWall extends StatefulWidget {
 
   /// enable debug mode, will display a debug panel with information
   final bool debug;
+  final bool selfCreatedController;
 
   BarrageWall({
     List<Bullet> bullets,
@@ -40,12 +41,13 @@ class BarrageWall extends StatefulWidget {
     this.massiveMode,
     this.maxBulletHeight,
     this.debug = false,
-  }) : controller = controller ??
+  })  : controller = controller ??
             BarrageWallController.withBarrages(
               bullets,
               barrageNotifier: barrageNotifier,
               timelineNotifier: timelineNotifier,
-            ) {
+            ),
+        selfCreatedController = controller == null {
     if (controller != null) {
       this.controller.value =
           controller.value.size == 0 ? BarrageWallValue.fromList(bullets ?? []) : controller.value;
@@ -284,8 +286,10 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.barrageNotifier.removeListener(handleBullets);
-    _controller.dispose();
+    if (widget.selfCreatedController) {
+      _controller.barrageNotifier.removeListener(handleBullets);
+      _controller.dispose();
+    }
     _cleaner?.cancel();
     super.dispose();
   }
