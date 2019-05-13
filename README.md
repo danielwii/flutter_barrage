@@ -1,5 +1,7 @@
 # flutter_barrage
 
+[![Join the chat at https://gitter.im/flutter_barrage/community](https://badges.gitter.im/flutter_barrage/community.svg)](https://gitter.im/flutter_barrage/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A barrage wall flutter plugin.
 一个弹幕墙插件。
 
