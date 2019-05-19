@@ -16,8 +16,15 @@ class BarrageWall extends StatefulWidget {
   /// time in seconds of bullet show in screen
   final int speed;
 
+  /// used to adjust speed for each channel
+  final int speedCorrection;
+
   final double width;
   final double height;
+
+  /// will not send bullets to the area is safe from bottom, default is 0
+  /// used to not cover the subtitles
+  final int safeBottomHeight;
 
   /// disable by default, will overwrite other bullets
   final bool massiveMode;
@@ -41,6 +48,8 @@ class BarrageWall extends StatefulWidget {
     this.massiveMode,
     this.maxBulletHeight,
     this.debug = false,
+    this.safeBottomHeight = 0,
+    this.speedCorrection = 0,
   })  : controller = controller ??
             BarrageWallController.withBarrages(
               bullets,
@@ -107,9 +116,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   int _totalChannels;
   int _channelMask;
   Map<dynamic, BulletPos> _lastBullets = {};
+  List<int> _speedCorrectionForChannels = [];
 
-  int _calcSafeHeight(double height) =>
-      height.isInfinite ? context.size.height.toInt() : height.toInt() - 80;
+  int _calcSafeHeight(double height) => height.isInfinite
+      ? context.size.height.toInt()
+      : (height - (_controller.safeBottomHeight ?? widget.safeBottomHeight)).toInt();
 
   /// null means no available channels exists
   int _nextChannel() {
@@ -156,7 +167,6 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     BuildContext context, {
     List<Bullet> bullets,
     double width,
-    @deprecated double height,
     double end,
   }) {
     // cannot get the width of widget when not rendered, make a twice longer width for now
@@ -164,11 +174,6 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
     bullets.forEach((Bullet bullet) {
       AnimationController controller;
-
-      controller =
-          AnimationController(duration: Duration(seconds: (widget.speed ?? 5) * 2), vsync: this);
-      Animation<double> animation =
-          new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
       _releaseChannels();
       final nextChannel = _nextChannel();
@@ -178,6 +183,13 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       if (nextChannel == null) {
         return;
       }
+
+      final showTimeInMilliseconds =
+          (widget.speed ?? 5) * 2 * 1000 - _speedCorrectionForChannels[nextChannel];
+      controller = AnimationController(
+          duration: Duration(milliseconds: showTimeInMilliseconds), vsync: this);
+      Animation<double> animation =
+          new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
       final channelHeightPos = nextChannel * _maxBulletHeight;
 
@@ -250,13 +262,18 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         _maxBulletHeight = widget.maxBulletHeight ?? 16;
         _totalChannels = _calcSafeHeight(_height) ~/ _maxBulletHeight;
         _channelMask = (2 << _totalChannels) - 1;
+
+        List<int>.generate(_totalChannels + 1, (i) {
+          _speedCorrectionForChannels
+              .add(widget.speedCorrection > 0 ? _random.nextInt(widget.speedCorrection) : 0);
+        });
+        print(_speedCorrectionForChannels);
       }
 
       _handleBullets(
         context,
         bullets: _controller.barrageNotifier.value.waitingList,
         width: _width,
-        height: _height,
       );
       _processed += _controller.barrageNotifier.value.waitingList.length;
       setState(() {});
@@ -383,12 +400,13 @@ class BarrageWallValue {
         size = bullets.length,
         processedSize = 0;
 
-  BarrageWallValue(
-      {this.bullets,
-      this.showedTimeBefore = 0,
-      this.waitingList = const [],
-      this.size = 0,
-      this.processedSize = 0});
+  BarrageWallValue({
+    this.bullets,
+    this.showedTimeBefore = 0,
+    this.waitingList = const [],
+    this.size = 0,
+    this.processedSize = 0,
+  });
 
   BarrageWallValue copyWith({
     int showedTimeBefore,
@@ -416,6 +434,7 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
   Timer _timer;
   bool _isDisposed = false;
   int timeline = 0;
+  int safeBottomHeight;
 
   BarrageWallController({
     List<Bullet> bullets,

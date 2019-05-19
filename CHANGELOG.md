@@ -1,3 +1,8 @@
+## 0.3.1
+
+* add speedCorrection param to adjust speed for each channels
+* add safeBottomHeight param to make user choose the height of the safe area
+
 ## 0.3.0
 
 * add massive mode

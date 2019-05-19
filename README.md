@@ -51,6 +51,9 @@ Column(
               debug: true, // show debug panel
               speed: 4, // speed of bullet show in screen (seconds)
               /*
+              speed: 8,
+              speedCorrection: 3000,*/
+              /*
                 timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
               bullets: bullets,
               child: new Container(),

@@ -31,14 +31,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Random random = new Random();
-    List<Bullet> bullets = List<Bullet>.generate(100, (i) {
+    List<Bullet> bullets = List<Bullet>.generate(1000, (i) {
       final showTime = random.nextInt(60000); // in 60s
       return Bullet(child: Text('$i-$showTime'), showTime: showTime);
     });
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -54,6 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         100,
                     child: BarrageWall(
                       debug: true,
+                      safeBottomHeight: 60, // do not send bullets to the safe area
+                      /*
+                      speed: 8,
+                      speedCorrection: 3000,*/
                       /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
                       bullets: bullets,
