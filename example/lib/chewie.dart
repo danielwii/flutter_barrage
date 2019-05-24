@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
 
 void main() => runApp(MyApp());
 
@@ -68,7 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
       looping: false,
       overlay: BarrageWall(
           debug: true,
-          safeBottomHeight: 60, // do not send bullets to the safe area
+          // do not send bullets to the safe area
+          safeBottomHeight: 60,
           /*
           speed: 8,*/
           speedCorrection: 3000,
