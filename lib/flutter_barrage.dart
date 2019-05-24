@@ -267,7 +267,6 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
           _speedCorrectionForChannels
               .add(widget.speedCorrection > 0 ? _random.nextInt(widget.speedCorrection) : 0);
         });
-        print(_speedCorrectionForChannels);
       }
 
       _handleBullets(
@@ -314,15 +313,15 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (_, snapshot) {
-      if (_width == null) _width = widget.width ?? snapshot.maxWidth;
-      if (_height == null) _height = widget.height ?? snapshot.maxHeight;
+      _width = widget.width ?? snapshot.maxWidth;
+      _height = widget.height ?? snapshot.maxHeight;
 
       return Stack(
-        fit: StackFit.loose,
+        fit: StackFit.expand,
         children: <Widget>[
           widget.debug
               ? Container(
-                  decoration: BoxDecoration(color: Colors.lightGreenAccent.withOpacity(0.8)),
+                  color: Colors.lightBlueAccent.withOpacity(0.7),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -337,7 +336,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
                 )
               : const SizedBox(),
           widget.child,
-        ]..addAll(_widgets.values ?? const SizedBox()),
+          Stack(
+            fit: StackFit.loose,
+            children: <Widget>[]..addAll(_widgets.values ?? const SizedBox()),
+          ),
+        ],
       );
     });
   }

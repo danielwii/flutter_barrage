@@ -7,6 +7,7 @@ dependencies:
 
   flutter_barrage:
     path: ../
+  chewie: ^0.9.7
 
 dev_dependencies:
   flutter_test:

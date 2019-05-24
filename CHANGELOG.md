@@ -1,3 +1,8 @@
+## 0.3.2
+
+* add chewie example
+* fix issues in fullscreen mode
+
 ## 0.3.1
 
 * add speedCorrection param to adjust speed for each channels
