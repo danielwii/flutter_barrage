@@ -1,3 +1,7 @@
+## 0.3.3
+
+* fix cannot send bullet when initial bullets is empty
+
 ## 0.3.2
 
 * add chewie example

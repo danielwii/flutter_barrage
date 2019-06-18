@@ -39,7 +39,6 @@ class BarrageWall extends StatefulWidget {
   BarrageWall({
     List<Bullet> bullets,
     BarrageWallController controller,
-    ValueNotifier<BarrageWallValue> barrageNotifier,
     ValueNotifier<BarrageValue> timelineNotifier,
     this.speed,
     this.child,
@@ -51,17 +50,15 @@ class BarrageWall extends StatefulWidget {
     this.safeBottomHeight = 0,
     this.speedCorrection = 0,
   })  : controller = controller ??
-            BarrageWallController.withBarrages(
-              bullets,
-              barrageNotifier: barrageNotifier,
-              timelineNotifier: timelineNotifier,
-            ),
+            BarrageWallController.withBarrages(bullets,
+                timelineNotifier: timelineNotifier),
         selfCreatedController = controller == null {
-    if (controller != null) {
-      this.controller.value =
-          controller.value.size == 0 ? BarrageWallValue.fromList(bullets ?? []) : controller.value;
-      this.controller.barrageNotifier = controller.barrageNotifier ?? barrageNotifier;
-      this.controller.timelineNotifier = controller.timelineNotifier ?? timelineNotifier;
+    if (controller != null && controller.value == null) {
+      this.controller.value = controller.value.size == 0
+          ? BarrageWallValue.fromList(bullets ?? [])
+          : controller.value;
+      this.controller.timelineNotifier =
+          controller.timelineNotifier ?? timelineNotifier;
     }
   }
 
@@ -120,7 +117,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
   int _calcSafeHeight(double height) => height.isInfinite
       ? context.size.height.toInt()
-      : (height - (_controller.safeBottomHeight ?? widget.safeBottomHeight)).toInt();
+      : (height - (_controller.safeBottomHeight ?? widget.safeBottomHeight))
+          .toInt();
 
   /// null means no available channels exists
   int _nextChannel() {
@@ -134,7 +132,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     var channel = _random.nextInt(_randomSeed);
     var channelCode = 1 << channel;
 
-    while (_usedChannel & channelCode != 0 && _usedChannel ^ _channelMask != 0) {
+    while (
+        _usedChannel & channelCode != 0 && _usedChannel ^ _channelMask != 0) {
       times++;
       channel = channel >= _totalChannels ? 0 : channel + 1;
       channelCode = 1 << channel;
@@ -156,7 +155,8 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       final channel = _lastBullets.keys.elementAt(i);
       var isNotReleased = !_lastBullets[channel].released;
       var liveTooLong = false; // now - _lastBullets[channel].lifetime > 3000;
-      if (liveTooLong || (isNotReleased && _lastBullets[channel].hasExtraSpace)) {
+      if (liveTooLong ||
+          (isNotReleased && _lastBullets[channel].hasExtraSpace)) {
         _lastBullets[channel].released = true;
         _usedChannel &= _channelMask ^ 1 << channel;
       }
@@ -184,10 +184,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         return;
       }
 
-      final showTimeInMilliseconds =
-          (widget.speed ?? 5) * 2 * 1000 - _speedCorrectionForChannels[nextChannel];
+      final showTimeInMilliseconds = (widget.speed ?? 5) * 2 * 1000 -
+          _speedCorrectionForChannels[nextChannel];
       controller = AnimationController(
-          duration: Duration(milliseconds: showTimeInMilliseconds), vsync: this);
+          duration: Duration(milliseconds: showTimeInMilliseconds),
+          vsync: this);
       Animation<double> animation =
           new Tween<double>(begin: 0, end: end).animate(controller..forward());
 
@@ -222,8 +223,10 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
           _releaseChannels();
           if (!_lastBullets.containsKey(nextChannel)) {
-            _lastBullets[nextChannel] =
-                BulletPos(id: context.hashCode, position: animation.value, width: widgetWidth);
+            _lastBullets[nextChannel] = BulletPos(
+                id: context.hashCode,
+                position: animation.value,
+                width: widgetWidth);
           }
 
           _lastBullets[nextChannel]?.updateWith(
@@ -253,7 +256,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   }
 
   void handleBullets() {
-    if (_processed != _controller.barrageNotifier.value.processedSize) {
+    if (_processed != _controller.value.processedSize) {
       if (_width == null || _height == null) {
         return;
       }
@@ -264,17 +267,18 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         _channelMask = (2 << _totalChannels) - 1;
 
         List<int>.generate(_totalChannels + 1, (i) {
-          _speedCorrectionForChannels
-              .add(widget.speedCorrection > 0 ? _random.nextInt(widget.speedCorrection) : 0);
+          _speedCorrectionForChannels.add(widget.speedCorrection > 0
+              ? _random.nextInt(widget.speedCorrection)
+              : 0);
         });
       }
 
       _handleBullets(
         context,
-        bullets: _controller.barrageNotifier.value.waitingList,
+        bullets: _controller.value.waitingList,
         width: _width,
       );
-      _processed += _controller.barrageNotifier.value.waitingList.length;
+      _processed += _controller.value.waitingList.length;
       setState(() {});
     }
   }
@@ -284,7 +288,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     _controller = widget.controller;
     _controller.initialize();
 
-    _controller.barrageNotifier.addListener(handleBullets);
+    _controller.addListener(handleBullets);
 
     /*
     _cleaner = Timer.periodic(Duration(seconds: 10), (timer) {
@@ -303,7 +307,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   @override
   void dispose() {
     if (widget.selfCreatedController) {
-      _controller.barrageNotifier.removeListener(handleBullets);
+      _controller.removeListener(handleBullets);
       _controller.dispose();
     }
     _cleaner?.cancel();
@@ -326,8 +330,9 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text('BarrageNotifier: ${_controller.barrageNotifier.value}'),
-                      Text('TimelineNotifier: ${_controller.timelineNotifier?.value}'),
+                      Text('BarrageWallValue: ${_controller.value}'),
+                      Text(
+                          'TimelineNotifier: ${_controller.timelineNotifier?.value}'),
                       Text('Timeline: ${_controller.timeline}'),
                       Text('Bullets: ${_widgets.length}'),
                       Text('UsedChannels: ${_usedChannel.toRadixString(2)}'),
@@ -362,7 +367,8 @@ class HashList<T> {
       if (_map.containsKey(key)) {
         _map[key].add(value);
       } else {
-        _map.putIfAbsent(key, () => TreeSet<T>(comparator: comparator)..add(value));
+        _map.putIfAbsent(
+            key, () => TreeSet<T>(comparator: comparator)..add(value));
       }
     });
   }
@@ -379,8 +385,9 @@ class BarrageValue {
 
   BarrageValue({this.timeline = -1, this.isPlaying = false});
 
-  BarrageValue copyWith({int timeline, bool isPlaying}) =>
-      BarrageValue(timeline: timeline ?? this.timeline, isPlaying: isPlaying ?? this.isPlaying);
+  BarrageValue copyWith({int timeline, bool isPlaying}) => BarrageValue(
+      timeline: timeline ?? this.timeline,
+      isPlaying: isPlaying ?? this.isPlaying);
 
   @override
   String toString() {
@@ -397,9 +404,9 @@ class BarrageWallValue {
 
   BarrageWallValue.fromList(List<Bullet> bullets,
       {this.showedTimeBefore = 0, this.waitingList = const []})
-      : bullets =
-            HashList<Bullet>(keyCalculator: (t) => Duration(milliseconds: t.showTime).inMinutes)
-              ..appendByMinutes(bullets),
+      : bullets = HashList<Bullet>(
+            keyCalculator: (t) => Duration(milliseconds: t.showTime).inMinutes)
+          ..appendByMinutes(bullets),
         size = bullets.length,
         processedSize = 0;
 
@@ -432,30 +439,25 @@ class BarrageWallValue {
 }
 
 class BarrageWallController extends ValueNotifier<BarrageWallValue> {
-  ValueNotifier<BarrageWallValue> barrageNotifier;
   ValueNotifier<BarrageValue> timelineNotifier;
   Timer _timer;
   bool _isDisposed = false;
   int timeline = 0;
   int safeBottomHeight;
 
-  BarrageWallController({
-    List<Bullet> bullets,
-    ValueNotifier<BarrageWallValue> barrageNotifier,
-    this.timelineNotifier,
-  })  : barrageNotifier = barrageNotifier ?? ValueNotifier(BarrageWallValue()),
-        super(BarrageWallValue.fromList(bullets ?? const []));
+  BarrageWallController({List<Bullet> bullets, this.timelineNotifier})
+      : super(BarrageWallValue.fromList(bullets ?? const []));
 
   BarrageWallController.withBarrages(List<Bullet> bullets,
-      {ValueNotifier<BarrageWallValue> barrageNotifier, this.timelineNotifier})
-      : barrageNotifier = barrageNotifier ?? ValueNotifier(BarrageWallValue()),
-        super(BarrageWallValue.fromList(bullets ?? const []));
+      {this.timelineNotifier})
+      : super(BarrageWallValue.fromList(bullets ?? const []));
 
   Future<void> initialize() async {
     final Completer<void> initializingCompleter = Completer<void>();
 
     if (timelineNotifier == null) {
-      _timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) async {
+      _timer = Timer.periodic(const Duration(milliseconds: 100),
+          (Timer timer) async {
         if (_isDisposed) {
           timer.cancel();
           return;
@@ -490,7 +492,8 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
     if (exists || bullets.isNotEmpty) {
       List<Bullet> toBePrecessed = value.bullets._map[key]
               ?.where((barrage) =>
-                  barrage.showTime > value.showedTimeBefore && barrage.showTime <= timeline)
+                  barrage.showTime > value.showedTimeBefore &&
+                  barrage.showTime <= timeline)
               ?.toList() ??
           [];
 
@@ -499,8 +502,6 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
             showedTimeBefore: timeline,
             waitingList: toBePrecessed..addAll(bullets ?? []),
             processedSize: toBePrecessed.length);
-
-        barrageNotifier.value = value;
       }
     }
   }
@@ -516,7 +517,6 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
     }
     _isDisposed = true;
     timelineNotifier?.removeListener(_handleTimelineNotifier);
-    barrageNotifier.dispose();
     super.dispose();
   }
 }
@@ -531,7 +531,7 @@ class Bullet implements Comparable<Bullet> {
 
   @override
   String toString() {
-    return 'Barrage{showTime: $showTime}';
+    return 'Bullet{child: $child, showTime: $showTime}';
   }
 
   @override

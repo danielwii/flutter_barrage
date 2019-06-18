@@ -31,10 +31,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Random random = new Random();
+    List<Bullet> bullets = [];
+    /*
     List<Bullet> bullets = List<Bullet>.generate(1000, (i) {
       final showTime = random.nextInt(60000); // in 60s
       return Bullet(child: Text('$i-$showTime'), showTime: showTime);
-    });
+    });*/
+    final textEditingController = TextEditingController();
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: SafeArea(
@@ -70,10 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
-//                    controller: textEditingController,
+                      controller: textEditingController,
+                      textInputAction: TextInputAction.send,
                       maxLength: 20,
                       onSubmitted: (text) {
-//                      textEditingController.clear();
+                        textEditingController.clear();
                         barrageWallController.send([new Bullet(child: Text(text))]);
                       })),
             ),
