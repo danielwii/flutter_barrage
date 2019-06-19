@@ -53,7 +53,7 @@ class BarrageWall extends StatefulWidget {
             BarrageWallController.withBarrages(bullets,
                 timelineNotifier: timelineNotifier),
         selfCreatedController = controller == null {
-    if (controller != null && controller.value == null) {
+    if (controller != null) {
       this.controller.value = controller.value.size == 0
           ? BarrageWallValue.fromList(bullets ?? [])
           : controller.value;
@@ -306,11 +306,12 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _cleaner?.cancel();
+    _widgets.forEach((controller, widget) => controller.dispose());
+    _controller.removeListener(handleBullets);
     if (widget.selfCreatedController) {
-      _controller.removeListener(handleBullets);
       _controller.dispose();
     }
-    _cleaner?.cancel();
     super.dispose();
   }
 
@@ -320,6 +321,13 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       _width = widget.width ?? snapshot.maxWidth;
       _height = widget.height ?? snapshot.maxHeight;
 
+      if (widget.debug) {
+        debugPrint("BarrageWallValue: ${_controller.value}");
+        debugPrint("TimelineNotifier: ${_controller.timelineNotifier?.value}");
+        debugPrint("Timeline: ${_controller.timeline}");
+        debugPrint("Bullets: ${_widgets.length}");
+        debugPrint("UsedChannels: ${_usedChannel.toRadixString(2)}");
+      }
       return Stack(
         fit: StackFit.expand,
         children: <Widget>[

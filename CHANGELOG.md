@@ -1,3 +1,7 @@
+## 0.3.4
+
+* fix timelineNotifier not working when init in barrageWall
+
 ## 0.3.3
 
 * fix cannot send bullet when initial bullets is empty
