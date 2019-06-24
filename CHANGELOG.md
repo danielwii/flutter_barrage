@@ -1,3 +1,8 @@
+## 0.4.0
+
+* feat: add enable/disable function for controller
+* feat: add barrage cleaner to improve performance
+
 ## 0.3.4
 
 * fix timelineNotifier not working when init in barrageWall

@@ -50,16 +50,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     Random random = new Random();
-    List<Bullet> bullets = List<Bullet>.generate(1000, (i) {
-      final showTime = random.nextInt(60000); // in 60s
+    List<Bullet> bullets = List<Bullet>.generate(60 * 60 * 20, (i) {
+      final showTime = random.nextInt(60 * 60 * 1000);
       return Bullet(
-          child: Container(
-            margin: EdgeInsets.all(2),
-            color: Colors.black,
-            child: Container(
-                padding: EdgeInsets.all(2), color: Colors.white, child: Text('$i-$showTime')),
-          ),
-          showTime: showTime);
+        showTime: showTime,
+//        child: Text('$i-$showTime'),
+        child: IgnorePointer(child: Text('$i-$showTime')),
+      );
     });
     chewieController = ChewieController(
       videoPlayerController: videoPlayerController,
@@ -72,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
           safeBottomHeight: 60,
           /*
           speed: 8,*/
-          speedCorrection: 3000,
+          speedCorrectionInMilliseconds: 5000,
           controller: barrageWallController,
           /*
           timelineNotifier: timelineNotifier,*/
@@ -93,32 +90,37 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
+        appBar: AppBar(title: Text(widget.title)),
+        floatingActionButton: Switch(
+            value: barrageWallController.isEnabled,
+            onChanged: (updateTo) {
+              barrageWallController.isEnabled
+                  ? barrageWallController.disable()
+                  : barrageWallController.enable();
+              setState(() {});
+            }),
+        body: OrientationBuilder(builder: (BuildContext context, Orientation orientation) {
           if (orientation == Orientation.landscape) {
             return Chewie(controller: chewieController);
           }
 
           return SafeArea(
-            child: Column(
-              children: <Widget>[
-                Expanded(
+            child: Column(children: <Widget>[
+              Expanded(
                   flex: 9,
-                  child: Stack(
-                    children: <Widget>[
+                  child: Container(
+                    color: Colors.pink,
+                    child: Stack(children: <Widget>[
                       Positioned(
-                        top: 20,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.width *
-                                MediaQuery.of(context).size.aspectRatio +
-                            300,
-                        child: Chewie(controller: chewieController),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
+                          top: 10,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width *
+                                  MediaQuery.of(context).size.aspectRatio +
+                              400,
+                          child: Chewie(controller: chewieController)),
+                    ]),
+                  )),
+              Expanded(
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -129,13 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             /*
                             textEditingController.clear();*/
                             barrageWallController.send([new Bullet(child: Text(text))]);
-                          })),
-                ),
-              ],
-            ),
+                          }))),
+            ]),
           );
-        },
-      ),
-    );
+        }));
   }
 }

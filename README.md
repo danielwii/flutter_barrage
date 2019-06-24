@@ -7,6 +7,8 @@ A barrage wall flutter plugin.
 
 ## Getting Started
 
+[more examples](https://github.com/danielwii/flutter_barrage/tree/master/example)
+
 * show barrage only
 
 ```dart
@@ -52,7 +54,7 @@ Column(
               speed: 4, // speed of bullet show in screen (seconds)
               /*
               speed: 8,
-              speedCorrection: 3000,*/
+              speedCorrectionInMilliseconds: 3000,*/
               /*
                 timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
               bullets: bullets,

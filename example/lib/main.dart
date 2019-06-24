@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       safeBottomHeight: 60, // do not send bullets to the safe area
                       /*
                       speed: 8,
-                      speedCorrection: 3000,*/
+                      speedCorrectionInMilliseconds: 3000,*/
                       /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
                       bullets: bullets,
