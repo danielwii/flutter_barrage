@@ -1,3 +1,7 @@
+## 0.4.1
+
+* dependency update
+
 ## 0.4.0
 
 * feat: add enable/disable function for controller
