@@ -1,3 +1,7 @@
+## 0.4.2
+
+* update flutter channel to stable
+
 ## 0.4.1
 
 * dependency update
