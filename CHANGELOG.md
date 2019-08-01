@@ -1,3 +1,7 @@
+## 0.4.3
+
+* fix cannot send bullet issue
+
 ## 0.4.2
 
 * update flutter channel to stable
