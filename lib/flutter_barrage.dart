@@ -260,8 +260,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   }
 
   void handleBullets() {
-    if (_controller.isEnabled &&
-        _processed != _controller.value.processedSize) {
+    if (_controller.isEnabled && _controller.value.waitingList.isNotEmpty) {
       if (_width == null || _height == null) {
         return;
       }
@@ -276,6 +275,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
               widget.speedCorrectionInMilliseconds > 0
                   ? _random.nextInt(widget.speedCorrectionInMilliseconds)
                   : 0);
+          return;
         });
       }
 

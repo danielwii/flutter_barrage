@@ -32,10 +32,13 @@ class _MyHomePageState extends State<MyHomePage> {
   VideoPlayerController videoPlayerController;
   BarrageWallController barrageWallController;
   ChewieController chewieController;
+  TextEditingController textEditingController;
 
   @override
   void initState() {
     super.initState();
+    textEditingController = TextEditingController();
+
     timelineNotifier = ValueNotifier(BarrageValue());
     videoPlayerController = VideoPlayerController.network(
         'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_10mb.mp4')
@@ -124,13 +127,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
-                          /*
-                          controller: textEditingController,*/
+                          controller: textEditingController,
                           maxLength: 20,
                           onSubmitted: (text) {
-                            /*
-                            textEditingController.clear();*/
                             barrageWallController.send([new Bullet(child: Text(text))]);
+                            textEditingController.clear();
                           }))),
             ]),
           );
