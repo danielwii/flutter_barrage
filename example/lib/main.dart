@@ -39,37 +39,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });*/
     final textEditingController = TextEditingController();
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
+        appBar: AppBar(title: Text(widget.title)),
+        body: SafeArea(
+            child: Column(children: <Widget>[
+          Expanded(
               flex: 9,
-              child: Stack(
-                children: <Widget>[
-                  Positioned(
+              child: Stack(children: <Widget>[
+                Positioned(
 //                    top: 20,
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.width *
                             MediaQuery.of(context).size.aspectRatio +
                         100,
                     child: BarrageWall(
-                      debug: true,
-                      safeBottomHeight: 60, // do not send bullets to the safe area
-                      /*
+                        debug: true,
+                        safeBottomHeight: 60, // do not send bullets to the safe area
+                        /*
                       speed: 8,
                       speedCorrectionInMilliseconds: 3000,*/
-                      /*
+                        /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
-                      bullets: bullets,
-                      child: new Container(),
-                      controller: barrageWallController,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
+                        bullets: bullets,
+                        child: new Container(),
+                        controller: barrageWallController)),
+              ])),
+          Expanded(
               child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
@@ -79,11 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onSubmitted: (text) {
                         textEditingController.clear();
                         barrageWallController.send([new Bullet(child: Text(text))]);
-                      })),
-            ),
-          ],
-        ),
-      ),
-    );
+                      }))),
+        ])));
   }
 }
