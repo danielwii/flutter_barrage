@@ -104,7 +104,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   double _height;
   Timer _cleaner;
 
-  int _maxBulletHeight;
+  double _maxBulletHeight;
   int _usedChannel = 0;
   int _totalChannels;
   int _channelMask;
