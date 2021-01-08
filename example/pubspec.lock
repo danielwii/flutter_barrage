@@ -35,7 +35,7 @@ packages:
       name: chewie
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.10"
+    version: "0.12.1+1"
   clock:
     dependency: transitive
     description:
@@ -50,6 +50,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0-nullsafety.3"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.16.2"
+  cupertino_icons:
+    dependency: transitive
+    description:
+      name: cupertino_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -79,6 +93,27 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0+4"
+  import_js_library:
+    dependency: transitive
+    description:
+      name: import_js_library
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.2"
   matcher:
     dependency: transitive
     description:
@@ -93,13 +128,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0-nullsafety.3"
-  open_iconic_flutter:
-    dependency: transitive
-    description:
-      name: open_iconic_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   path:
     dependency: transitive
     description:
@@ -113,7 +141,7 @@ packages:
       name: quiver
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.3"
+    version: "2.1.5"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -181,7 +209,7 @@ packages:
       name: video_player
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.10.12+5"
+    version: "1.0.1"
   video_player_platform_interface:
     dependency: transitive
     description:
@@ -195,14 +223,28 @@ packages:
       name: video_player_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4"
+    version: "0.1.4+1"
   wakelock:
     dependency: transitive
     description:
       name: wakelock
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4+2"
+    version: "0.2.1+1"
+  wakelock_platform_interface:
+    dependency: transitive
+    description:
+      name: wakelock_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0+1"
+  wakelock_web:
+    dependency: transitive
+    description:
+      name: wakelock_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0+3"
 sdks:
   dart: ">=2.10.0-110 <2.11.0"
-  flutter: ">=1.12.13+hotfix.5 <2.0.0"
+  flutter: ">=1.22.0 <2.0.0"

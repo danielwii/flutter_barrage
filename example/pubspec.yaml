@@ -4,7 +4,7 @@ description: An example project for flutter_barrage.
 dependencies:
   flutter:
     sdk: flutter
-  chewie: ^0.9.7
+  chewie: ^0.12.1+1
 
   flutter_barrage:
     path: ../
