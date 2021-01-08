@@ -334,6 +334,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         debugPrint("TimelineNotifier: ${_controller.timelineNotifier?.value}");
         debugPrint("Timeline: ${_controller.timeline}");
         debugPrint("Bullets: ${_widgets.length}");
+        debugPrint("Processed: $_processed");
         debugPrint("UsedChannels: ${_usedChannel.toRadixString(2)}");
         debugPrint("LastBullets[0]: ${_lastBullets[0]}");
       }

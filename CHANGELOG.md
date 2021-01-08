@@ -1,3 +1,7 @@
+## 0.4.4
+
+* fix maxBulletHeight type mismatch issue
+
 ## 0.4.3
 
 * fix cannot send bullet issue
