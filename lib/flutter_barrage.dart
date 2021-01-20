@@ -26,7 +26,7 @@ class BarrageWall extends StatefulWidget {
   /// used to not cover the subtitles
   final int safeBottomHeight;
 
-  /// disable by default, will overwrite other bullets
+  /// [disable] by default, will overwrite other bullets
   final bool massiveMode;
 
   /// used to make barrage tidy

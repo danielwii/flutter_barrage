@@ -1,3 +1,7 @@
+## 0.4.5
+
+* update README
+
 ## 0.4.4
 
 * fix maxBulletHeight type mismatch issue
