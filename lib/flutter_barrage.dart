@@ -211,8 +211,10 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
               widgetWidth = box?.size?.width;
             }
 
+            // 通过计算出的 widget width 在判断弹幕完全移出了可视区域
             if (box != null &&
                 RenderObject.debugActiveLayout == null &&
+                widgetWidth > 0 &&
                 animation.value > (fixedWidth + widgetWidth)) {
               _lastBullets[nextChannel]?.updateWith(position: double.infinity);
               return const SizedBox();

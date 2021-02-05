@@ -1,3 +1,7 @@
+## 0.4.6
+
+* fix ios release version cannot calc widget width issue
+
 ## 0.4.5
 
 * update README
