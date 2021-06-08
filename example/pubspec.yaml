@@ -1,10 +1,13 @@
 name: flutter_barrage_example
 description: An example project for flutter_barrage.
 
+environment:
+  sdk: '>=2.13.0 <3.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
-  chewie: ^0.12.1+1
+  chewie: ^1.2.1
 
   flutter_barrage:
     path: ../

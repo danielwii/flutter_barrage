@@ -19,24 +19,25 @@ class MyApp extends StatelessWidget {
 final barrageWallController = BarrageWallController();
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<StatefulWidget> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Random random = new Random();
-    List<Bullet> bullets = [];
-    /*
+    // List<Bullet> bullets = [];
+
     List<Bullet> bullets = List<Bullet>.generate(1000, (i) {
       final showTime = random.nextInt(60000); // in 60s
       return Bullet(child: Text('$i-$showTime'), showTime: showTime);
-    });*/
+    });
+
     final textEditingController = TextEditingController();
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
@@ -53,7 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         100,
                     child: BarrageWall(
                         debug: true,
-                        safeBottomHeight: 60, // do not send bullets to the safe area
+                        safeBottomHeight:
+                            60, // do not send bullets to the safe area
                         /*
                       speed: 8,
                       speedCorrectionInMilliseconds: 3000,*/
@@ -72,7 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       maxLength: 20,
                       onSubmitted: (text) {
                         textEditingController.clear();
-                        barrageWallController.send([new Bullet(child: Text(text))]);
+                        barrageWallController
+                            .send([new Bullet(child: Text(text))]);
                       }))),
         ])));
   }
