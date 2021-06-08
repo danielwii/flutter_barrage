@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -27,12 +27,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ValueNotifier<BarrageValue> timelineNotifier;
-  VideoPlayerController videoPlayerController;
-  BarrageWallController barrageWallController;
-  ChewieController chewieController;
-  TextEditingController textEditingController;
-  FocusNode focus;
+  late ValueNotifier<BarrageValue> timelineNotifier;
+  late VideoPlayerController videoPlayerController;
+  late BarrageWallController barrageWallController;
+  late ChewieController chewieController;
+  late TextEditingController textEditingController;
+  // late FocusNode focus;
 
   @override
   void initState() {
@@ -40,14 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
     textEditingController = TextEditingController();
 
     timelineNotifier = ValueNotifier(BarrageValue());
-    videoPlayerController =
-        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_10mb.mp4')
-          ..addListener(() {
-            timelineNotifier.value = timelineNotifier.value.copyWith(
-                timeline: videoPlayerController.value.position.inMilliseconds,
-                isPlaying: videoPlayerController.value.isPlaying);
-          });
-    barrageWallController = BarrageWallController(timelineNotifier: timelineNotifier);
+    videoPlayerController = VideoPlayerController.network(
+        'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_10mb.mp4')
+      ..addListener(() {
+        timelineNotifier.value = timelineNotifier.value.copyWith(
+            timeline: videoPlayerController.value.position.inMilliseconds,
+            isPlaying: videoPlayerController.value.isPlaying);
+      });
+    barrageWallController =
+        BarrageWallController(timelineNotifier: timelineNotifier);
 
     Random random = new Random();
     List<Bullet> bullets = List<Bullet>.generate(60 * 60 * 20, (i) {
@@ -82,10 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     super.dispose();
-    timelineNotifier?.dispose();
-    barrageWallController?.dispose();
-    videoPlayerController?.dispose();
-    chewieController?.dispose();
+    timelineNotifier.dispose();
+    barrageWallController.dispose();
+    videoPlayerController.dispose();
+    chewieController.dispose();
   }
 
   @override
@@ -96,7 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: Switch(
             value: barrageWallController.isEnabled,
             onChanged: (updateTo) {
-              barrageWallController.isEnabled ? barrageWallController.disable() : barrageWallController.enable();
+              barrageWallController.isEnabled
+                  ? barrageWallController.disable()
+                  : barrageWallController.enable();
               setState(() {});
             }),
         body: orientation == Orientation.landscape
@@ -111,17 +114,21 @@ class _MyHomePageState extends State<MyHomePage> {
                             Positioned(
                                 top: 10,
                                 width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.width * MediaQuery.of(context).size.aspectRatio + 100,
+                                height: MediaQuery.of(context).size.width *
+                                        MediaQuery.of(context)
+                                            .size
+                                            .aspectRatio +
+                                    100,
                                 child: Chewie(controller: chewieController)),
                           ]))),
                   Expanded(
                       child: TextField(
-                          focusNode: focus,
+                          // focusNode: focus,
                           controller: textEditingController,
                           maxLength: 20,
                           onSubmitted: (text) {
-                            barrageWallController.send([new Bullet(child: Text(text))]);
+                            barrageWallController
+                                .send([new Bullet(child: Text(text))]);
                             textEditingController.clear();
                           })),
                 ]),
