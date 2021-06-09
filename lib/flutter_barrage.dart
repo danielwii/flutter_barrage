@@ -260,9 +260,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   void didUpdateWidget(BarrageWall oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
-      if (oldWidget.controller != null && widget.controller == null) {
-        _controller = widget.controller;
-      }
+      _controller = widget.controller;
     }
   }
 
@@ -524,7 +522,7 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
               ?.where((barrage) =>
                   barrage.showTime > value.showedTimeBefore &&
                   barrage.showTime <= timeline)
-              ?.toList() ??
+              .toList() ??
           [];
 
       if (toBePrecessed.isNotEmpty || bullets.isNotEmpty) {
