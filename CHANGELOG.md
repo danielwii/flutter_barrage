@@ -1,6 +1,11 @@
+## 0.5.1
+
+* dependencies up-to-date
+
 ## 0.5.0-nullsafety.0
 
 * flutter2 nullsafety support
+
 ## 0.4.6
 
 * fix ios release version cannot calc widget width issue

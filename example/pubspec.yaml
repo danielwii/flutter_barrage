@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  chewie: ^1.3.2
+  chewie: ^1.3.3
 
   flutter_barrage:
     path: ../
