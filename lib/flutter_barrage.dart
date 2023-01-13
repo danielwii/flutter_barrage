@@ -26,7 +26,7 @@ class BarrageWall extends StatefulWidget {
   /// used to not cover the subtitles
   final int safeBottomHeight;
 
-  /// [disable] by default, will overwrite other bullets
+  /// [disable] by default, set to true will overwrite other bullets
   final bool massiveMode;
 
   /// used to make barrage tidy
@@ -66,6 +66,7 @@ class BarrageWall extends StatefulWidget {
   State<StatefulWidget> createState() => _BarrageState();
 }
 
+/// It's a class that holds the position of a bullet
 class BulletPos {
   int id;
   int channel;
@@ -208,23 +209,23 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
             return const SizedBox();
           }
 
-          var widgetWidth = 0.0;
-          // if (context.findRenderObject() != null) {
-          //   final RenderObject? box = context.findRenderObject();
-          //
-          //   if (box != null && RenderObject.debugActiveLayout == null) {
-          //     widgetWidth = box.size?.width;
-          //   }
-          //
-          //   // 通过计算出的 widget width 在判断弹幕完全移出了可视区域
-          //   if (box != null &&
-          //       RenderObject.debugActiveLayout == null &&
-          //       widgetWidth > 0 &&
-          //       animation.value > (fixedWidth + widgetWidth)) {
-          //     _lastBullets[nextChannel]?.updateWith(position: double.infinity);
-          //     return const SizedBox();
-          //   }
-          // }
+          double widgetWidth = 0.0;
+
+          /// get current widget width
+          if (child != null) {
+            final renderBox = context.findRenderObject() as RenderBox?;
+            if (renderBox?.hasSize ?? false) {
+              widgetWidth = renderBox!.size.width;
+
+              /// 通过计算出的 widget width 在判断弹幕完全移出了可视区域
+              if (widgetWidth > 0 &&
+                  animation.value > (fixedWidth + widgetWidth)) {
+                _lastBullets[nextChannel]
+                    ?.updateWith(position: double.infinity);
+                return const SizedBox();
+              }
+            }
+          }
 
 //          debugPrint(
 //              '${_lastBullets[nextChannel]?.id} == ${context.hashCode} $child pos: ${animation.value}');

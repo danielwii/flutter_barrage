@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     timelineNotifier = ValueNotifier(BarrageValue());
     videoPlayerController = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_10mb.mp4')
+        'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_30mb.mp4')
       ..addListener(() {
         timelineNotifier.value = timelineNotifier.value.copyWith(
             timeline: videoPlayerController.value.position.inMilliseconds,
@@ -55,28 +55,30 @@ class _MyHomePageState extends State<MyHomePage> {
       final showTime = random.nextInt(60 * 60 * 1000);
       return Bullet(
         showTime: showTime,
-//        child: Text('$i-$showTime'),
-        child: IgnorePointer(child: Text('$i-$showTime')),
+        child: Text('$i-$showTime'),
+        // child: IgnorePointer(child: Text('$i-$showTime')),
       );
     });
     chewieController = ChewieController(
       videoPlayerController: videoPlayerController,
       aspectRatio: 3 / 2,
       showControls: false,
-      autoPlay: false,
+      autoPlay: true,
       looping: false,
       overlay: BarrageWall(
-          debug: true,
-          // do not send bullets to the safe area
-          safeBottomHeight: 60,
-          /*
+        debug: true,
+        // do not send bullets to the safe area
+        safeBottomHeight: 60,
+        /*
           speed: 8,*/
-          speedCorrectionInMilliseconds: 5000,
-          controller: barrageWallController,
-          /*
+        massiveMode: false,
+        speedCorrectionInMilliseconds: 5000,
+        controller: barrageWallController,
+        /*
           timelineNotifier: timelineNotifier,*/
-          bullets: bullets,
-          child: const SizedBox()),
+        bullets: bullets,
+        child: const SizedBox(),
+      ),
     );
   }
 
@@ -93,45 +95,49 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        floatingActionButton: Switch(
-            value: barrageWallController.isEnabled,
-            onChanged: (updateTo) {
-              barrageWallController.isEnabled
-                  ? barrageWallController.disable()
-                  : barrageWallController.enable();
-              setState(() {});
-            }),
-        body: orientation == Orientation.landscape
-            ? Chewie(controller: chewieController)
-            : SafeArea(
-                child: Column(children: <Widget>[
-                  Expanded(
-                      flex: 9,
-                      child: Container(
-                          color: Colors.pink,
-                          child: Stack(children: <Widget>[
-                            Positioned(
-                                top: 10,
-                                width: MediaQuery.of(context).size.width,
-                                height: MediaQuery.of(context).size.width *
-                                        MediaQuery.of(context)
-                                            .size
-                                            .aspectRatio +
-                                    100,
-                                child: Chewie(controller: chewieController)),
-                          ]))),
-                  Expanded(
-                      child: TextField(
-                          // focusNode: focus,
-                          controller: textEditingController,
-                          maxLength: 20,
-                          onSubmitted: (text) {
-                            barrageWallController
-                                .send([new Bullet(child: Text(text))]);
-                            textEditingController.clear();
-                          })),
-                ]),
-              ));
+      appBar: AppBar(title: Text(widget.title)),
+      floatingActionButton: Switch(
+        value: barrageWallController.isEnabled,
+        onChanged: (updateTo) {
+          barrageWallController.isEnabled
+              ? barrageWallController.disable()
+              : barrageWallController.enable();
+          setState(() {});
+        },
+      ),
+      body: orientation == Orientation.landscape
+          ? Chewie(controller: chewieController)
+          : SafeArea(
+              child: Column(children: <Widget>[
+                Expanded(
+                  flex: 9,
+                  child: Container(
+                    color: Colors.pink,
+                    child: Stack(children: <Widget>[
+                      Positioned(
+                          top: 10,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width *
+                                  MediaQuery.of(context).size.aspectRatio +
+                              100,
+                          child: Chewie(controller: chewieController)),
+                    ]),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    // focusNode: focus,
+                    controller: textEditingController,
+                    maxLength: 20,
+                    onSubmitted: (text) {
+                      barrageWallController
+                          .send([new Bullet(child: Text(text))]);
+                      textEditingController.clear();
+                    },
+                  ),
+                ),
+              ]),
+            ),
+    );
   }
 }
