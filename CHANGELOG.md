@@ -1,3 +1,7 @@
+## 0.5.2
+
+* Fix: `massive mode` option was not working properly
+
 ## 0.5.1
 
 * dependencies up-to-date

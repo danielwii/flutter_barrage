@@ -15,7 +15,7 @@ A barrage wall flutter plugin.
 * **double width** - 容器宽度
 * **double height** - 容器高度
 * **bool massiveMode** - 海量模式，默认关闭，此时当所有通道都被占用时弹幕将被丢弃，不会产生覆盖的情况。当开启式会实时显示所有弹幕，所有通道被占用时会覆盖之前的弹幕。
-* **double maxBulletHeight** - 弹幕的最大高度，用于计算通道，默认 16。（有用户提到需要明确设置 https://github.com/danielwii/flutter_barrage/issues/3#issuecomment-759920796 弹幕的覆盖问题才会正确。）
+* **double maxBulletHeight** - 弹幕的最大高度，用于计算通道，默认 16。
 * **int speedCorrectionInMilliseconds** - 默认 3000，用于调整不同通道的速度，不同的通道会在这个值的范围内找到一个随机值并调整当前通道的速度
 * **bool debug** - 调试模式，会显示一个数据面板
 * **int safeBottomHeight** - 默认 0，用于保证在最下方有一个不会显示弹幕的空间，避免挡住字幕
