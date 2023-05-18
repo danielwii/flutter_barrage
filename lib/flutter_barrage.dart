@@ -108,7 +108,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   int _processed = 0;
   double? _width;
   double? _height;
-  double? _lastHeight; // 上一次计算通道跟书的的高度记录
+  double? _lastHeight; // 上一次计算通道个数的的高度记录
   late Timer _cleaner;
 
   int _usedChannel = 0;
