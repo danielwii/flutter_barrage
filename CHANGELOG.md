@@ -1,3 +1,7 @@
+## 0.5.3
+
+* add channel update when height change. thanks for @9527001
+
 ## 0.5.2
 
 * Fix: `massive mode` option was not working properly

@@ -1,10 +1,10 @@
 name: flutter_barrage
 description: A new barrage package project. Used to send bullet(danmu) to a container.
-version: 0.5.2
+version: 0.5.3
 homepage: https://github.com/danielwii/flutter_barrage.git
 
 environment:
-  sdk: '>=2.16.2 <3.0.0'
+  sdk: '>=2.16.2 <4.0.0'
 
 dependencies:
   flutter:
