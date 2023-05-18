@@ -108,6 +108,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   int _processed = 0;
   double? _width;
   double? _height;
+  double? _lastHeight; // 上一次计算通道跟书的的高度记录
   late Timer _cleaner;
 
   int _usedChannel = 0;
@@ -271,7 +272,9 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         return;
       }
 
-      if (_totalChannels == null) {
+      if (_totalChannels == null ||
+          (_totalChannels != null && _lastHeight != _height)) {
+        _lastHeight = _height;
         _maxBulletHeight = widget.maxBulletHeight;
         _totalChannels = _calcSafeHeight(_height!) ~/ _maxBulletHeight!;
         _channelMask = (2 << _totalChannels!) - 1;
