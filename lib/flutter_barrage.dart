@@ -132,7 +132,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     }
 
     var times = 1;
-    var channel = _random.nextInt(_randomSeed);
+    var channel = _randomSeed == 0 ? 0 : _random.nextInt(_randomSeed);
     var channelCode = 1 << channel;
 
     while (
