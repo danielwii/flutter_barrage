@@ -40,8 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     textEditingController = TextEditingController();
 
     timelineNotifier = ValueNotifier(BarrageValue());
-    videoPlayerController = VideoPlayerController.network(
-        'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_30mb.mp4')
+    videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse('https://download.samplelib.com/mp4/sample-30s.mp4'))
       ..addListener(() {
         timelineNotifier.value = timelineNotifier.value.copyWith(
             timeline: videoPlayerController.value.position.inMilliseconds,

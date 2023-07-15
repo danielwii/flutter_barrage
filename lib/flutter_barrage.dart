@@ -339,13 +339,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       _height = widget.height ?? snapshot.maxHeight;
 
       if (widget.debug) {
-        debugPrint("BarrageWallValue: ${_controller.value}");
-        debugPrint("TimelineNotifier: ${_controller.timelineNotifier?.value}");
-        debugPrint("Timeline: ${_controller.timeline}");
-        debugPrint("Bullets: ${_widgets.length}");
-        debugPrint("Processed: $_processed");
-        debugPrint("UsedChannels: ${_usedChannel.toRadixString(2)}");
-        debugPrint("LastBullets[0]: ${_lastBullets[0]}");
+        debugPrint("BarrageWallValue: ${_controller.value} "
+            "TimelineNotifier: ${_controller.timelineNotifier?.value} "
+            "Timeline: ${_controller.timeline} "
+            "Bullets: ${_widgets.length} "
+            "Processed: $_processed UsedChannels: ${_usedChannel.toRadixString(2)} LastBullets[0]: ${_lastBullets[0]}");
       }
       return Stack(fit: StackFit.expand, children: <Widget>[
         widget.debug
@@ -512,7 +510,19 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
     return initializingCompleter.future;
   }
 
+  /// reset the controller to new time state
+  void reset(int showedTimeBefore) {
+    value = value.copyWith(
+        showedTimeBefore: showedTimeBefore, waitingList: [], processedSize: 0);
+  }
+
   void _handleTimelineNotifier() {
+    final offset = (timeline - timelineNotifier!.value.timeline);
+    final ifNeedReset = offset.abs() > 1000;
+    if (ifNeedReset) {
+      debugPrint('offset: $offset call reset to $timeline...');
+      reset(timelineNotifier!.value.timeline);
+    }
     if (timelineNotifier != null) timeline = timelineNotifier!.value.timeline;
     tryFire();
   }
