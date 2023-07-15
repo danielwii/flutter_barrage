@@ -1,3 +1,8 @@
+## 0.5.4
+
+* Fix: one channel not support issue
+* Fix: show barrage in timeline change issue
+
 ## 0.5.3
 
 * add channel update when height change. thanks for @9527001
