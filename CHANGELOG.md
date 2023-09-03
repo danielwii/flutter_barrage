@@ -1,3 +1,9 @@
+# Changelog
+
+## 0.5.5
+
+* Fix: add clear function to clear all firing bullets
+
 ## 0.5.4
 
 * Fix: one channel not support issue

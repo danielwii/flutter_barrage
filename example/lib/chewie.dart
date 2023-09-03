@@ -124,6 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     ]),
                   ),
                 ),
+                ElevatedButton(
+                    onPressed: () => barrageWallController.clear(),
+                    child: Text('Clear')),
                 Expanded(
                   child: TextField(
                     // focusNode: focus,
