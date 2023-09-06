@@ -63,7 +63,7 @@ Column(
                     MediaQuery.of(context).size.aspectRatio +
                 100,
             child: BarrageWall(
-              debug: true, // show debug panel
+              debug: true, // show debug panel and logs
               speed: 4, // speed of bullet show in screen (seconds)
               /*
               speed: 8,
@@ -71,7 +71,6 @@ Column(
               /*
                 timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
               bullets: bullets,
-              child: new Container(),
               controller: barrageWallController,
             ),
           ),

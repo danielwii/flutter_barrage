@@ -7,6 +7,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:quiver/collection.dart';
 
+const TAG = 'FlutterBarrage';
+
 class BarrageWall extends StatefulWidget {
   final BarrageWallController controller;
 
@@ -41,7 +43,7 @@ class BarrageWall extends StatefulWidget {
     BarrageWallController? controller,
     ValueNotifier<BarrageValue>? timelineNotifier,
     this.speed = 5,
-    required this.child,
+    this.child = const SizedBox(),
     this.width,
     this.height,
     this.massiveMode = false,
@@ -88,7 +90,7 @@ class BulletPos {
     this.position = position;
     this.width = width > 0 ? width : this.width;
     this.lifetime = DateTime.now().millisecondsSinceEpoch;
-//    debugPrint('update to $this');
+//    debugPrint("[$TAG] update to $this");
   }
 
   bool get hasExtraSpace {
@@ -116,10 +118,24 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   // Map<dynamic, BulletPos> _lastBullets = {};
   List<int> _speedCorrectionForChannels = [];
 
-  int _calcSafeHeight(double height) => height.isInfinite
-      ? context.size!.height.toInt()
-      : (height - (_controller.safeBottomHeight ?? widget.safeBottomHeight))
-          .toInt();
+  int _calcSafeHeight(double height) {
+    if (height.isInfinite) {
+      final toHeight = context.size!.height;
+      debugPrint("[$TAG] height is infinite, set it to $toHeight");
+      return toHeight.toInt();
+    } else {
+      final safeBottomHeight =
+          _controller.safeBottomHeight ?? widget.safeBottomHeight;
+      final toHeight = height - safeBottomHeight;
+      debugPrint(
+          '[$TAG] safe bottom height: $safeBottomHeight, set safe height to $toHeight');
+      if (toHeight < 0) {
+        throw Exception(
+            'safe bottom height is too large, it should be less than $height');
+      }
+      return toHeight.toInt();
+    }
+  }
 
   /// null means no available channels exists
   int? _nextChannel() {
@@ -179,7 +195,9 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     end ??= width * 2;
 
     _releaseChannels();
-    debugPrint('handle bullets: ${bullets.length} - $_controller.usedChannel');
+    if (widget.debug)
+      debugPrint(
+          '[$TAG] handle bullets: ${bullets.length} - $_controller.usedChannel');
     bullets.forEach((Bullet bullet) {
       AnimationController animationController;
 
@@ -232,7 +250,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
           }
 
 //          debugPrint(
-//              '${_controller.lastBullets[nextChannel]?.id} == ${context.hashCode} $child pos: ${animation.value}');
+//              '[$TAG] ${_controller.lastBullets[nextChannel]?.id} == ${context.hashCode} $child pos: ${animation.value}');
           // 【通道不为空】或者【通道的最后元素】之后出现了可以新增的元素
           if (!_controller.lastBullets.containsKey(nextChannel) ||
               (_controller.lastBullets.containsKey(nextChannel) &&
@@ -244,7 +262,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
                 position: animation.value,
                 width: widgetWidth,
                 widget: child!);
-//            debugPrint('add ${_controller.lastBullets[nextChannel]} - ${context.hashCode}');
+//            debugPrint("[$TAG] add ${_controller.lastBullets[nextChannel]} - ${context.hashCode}");
           } else if (_controller.lastBullets[nextChannel]!.id ==
               context.hashCode) {
             // 当前元素是最后元素，更新相关信息
@@ -277,20 +295,21 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
         return;
       }
 
-      if (_totalChannels == null ||
-          (_totalChannels != null && _lastHeight != _height)) {
+      final recallNeeded = _lastHeight != _height || _channelMask == null;
+
+      if (_totalChannels == null || recallNeeded) {
         _lastHeight = _height;
         _maxBulletHeight = widget.maxBulletHeight;
         _totalChannels = _calcSafeHeight(_height!) ~/ _maxBulletHeight!;
+        debugPrint("[$TAG] total channels: ${_totalChannels! + 1}");
         _channelMask = (2 << _totalChannels!) - 1;
 
-        List<int>.generate(_totalChannels! + 1, (i) {
-          _speedCorrectionForChannels.add(
-              widget.speedCorrectionInMilliseconds > 0
-                  ? _random.nextInt(widget.speedCorrectionInMilliseconds)
-                  : 0);
-          return 0;
-        });
+        for (var i = 0; i <= _totalChannels!; i++) {
+          final nextSpeed = widget.speedCorrectionInMilliseconds > 0
+              ? _random.nextInt(widget.speedCorrectionInMilliseconds)
+              : 0;
+          _speedCorrectionForChannels.add(nextSpeed);
+        }
       }
 
       _handleBullets(
@@ -344,7 +363,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
       _height = widget.height ?? snapshot.maxHeight;
 
       if (widget.debug) {
-        debugPrint("BarrageWallValue: ${_controller.value} "
+        debugPrint("[$TAG] BarrageWallValue: ${_controller.value} "
             "TimelineNotifier: ${_controller.timelineNotifier?.value} "
             "Timeline: ${_controller.timeline} "
             "Bullets: ${_controller.widgets.length} "
@@ -551,7 +570,7 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
     final offset = (timeline - timelineNotifier!.value.timeline);
     final ifNeedReset = offset.abs() > 1000;
     if (ifNeedReset) {
-      debugPrint('offset: $offset call reset to $timeline...');
+      debugPrint("[$TAG] offset: $offset call reset to $timeline...");
       reset(timelineNotifier!.value.timeline);
     }
     if (timelineNotifier != null) timeline = timelineNotifier!.value.timeline;
@@ -580,12 +599,12 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
   }
 
   disable() {
-    debugPrint("disable barrage ... current: $enabledNotifier");
+    debugPrint("[$TAG] disable barrage ... current: $enabledNotifier");
     enabledNotifier.value = false;
   }
 
   enable() {
-    debugPrint("enable barrage ... current: $enabledNotifier");
+    debugPrint("[$TAG] enable barrage ... current: $enabledNotifier");
     enabledNotifier.value = true;
   }
 

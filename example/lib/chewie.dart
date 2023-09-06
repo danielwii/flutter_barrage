@@ -55,7 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
       final showTime = random.nextInt(60 * 60 * 1000);
       return Bullet(
         showTime: showTime,
-        child: Text('$i-$showTime'),
+        child: Text(
+          '$i-$showTime',
+          style: TextStyle(color: Colors.white),
+        ),
         // child: IgnorePointer(child: Text('$i-$showTime')),
       );
     });
@@ -77,7 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
         /*
           timelineNotifier: timelineNotifier,*/
         bullets: bullets,
-        child: const SizedBox(),
       ),
     );
   }

@@ -62,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         /*
                         timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
                         bullets: bullets,
-                        child: new Container(),
                         controller: barrageWallController)),
               ])),
           Expanded(
