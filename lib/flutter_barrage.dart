@@ -103,7 +103,8 @@ class BulletPos {
   }
 }
 
-class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
+class _BarrageState extends State<BarrageWall>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late BarrageWallController _controller;
   Random _random = new Random();
   int _processed = 0;
@@ -117,6 +118,11 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   int? _channelMask;
   // Map<dynamic, BulletPos> _lastBullets = {};
   List<int> _speedCorrectionForChannels = [];
+
+  @override
+  didChangeMetrics() {
+    _controller.clear();
+  }
 
   int _calcSafeHeight(double height) {
     if (height.isInfinite) {
@@ -197,7 +203,7 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     _releaseChannels();
     if (widget.debug)
       debugPrint(
-          '[$TAG] handle bullets: ${bullets.length} - $_controller.usedChannel');
+          '[$TAG] handle bullets: ${bullets.length} - ${_controller.usedChannel.toRadixString(2)}');
     bullets.forEach((Bullet bullet) {
       AnimationController animationController;
 
@@ -343,10 +349,14 @@ class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
     });
 
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
     _cleaner.cancel();
     _controller.widgets.forEach((controller, widget) => controller.dispose());
     _controller.removeListener(handleBullets);
