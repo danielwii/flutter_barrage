@@ -52,17 +52,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: MediaQuery.of(context).size.width *
                             MediaQuery.of(context).size.aspectRatio +
                         100,
-                    child: BarrageWall(
-                        debug: true,
-                        safeBottomHeight:
-                            60, // do not send bullets to the safe area
-                        /*
-                      speed: 8,
-                      speedCorrectionInMilliseconds: 3000,*/
-                        /*
-                        timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
-                        bullets: bullets,
-                        controller: barrageWallController)),
+                    child: LayoutBuilder(
+                        builder: (context, constraints) => BarrageWall(
+                            debug: true,
+                            width: constraints.maxWidth,
+                            height: constraints.maxHeight,
+                            safeBottomHeight:
+                                60, // do not send bullets to the safe area
+                            /*
+                          speed: 8,
+                          speedCorrectionInMilliseconds: 3000,*/
+                            /*
+                            timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
+                            bullets: bullets,
+                            controller: barrageWallController))),
               ])),
           Expanded(
               child: Padding(

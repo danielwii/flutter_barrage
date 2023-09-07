@@ -5,6 +5,8 @@ A barrage wall flutter plugin.
 
 ## Getting Started
 
+> BarrageWall 需要明确的 width 和 height 来计算可用空间。
+
 #### BarrageWall 参数
 
 * **List<Bullet> bullets** - 初始化的弹幕列表
@@ -24,7 +26,7 @@ A barrage wall flutter plugin.
 
 * show barrage only
 
-```dart
+```flutter
 List<Bullet> bullets = List<Bullet>.generate(100, (i) {
   final showTime = random.nextInt(60000); // in 60s
   return Bullet(child: Text('$i-$showTime}'), showTime: showTime);
@@ -36,11 +38,16 @@ Stack(
       width: MediaQuery.of(context).size.width,
       height:
           MediaQuery.of(context).size.width * MediaQuery.of(context).size.aspectRatio + 200,
-      child: BarrageWall(
-        massiveMode: false, // disabled by default
-        timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline
-        bullets: bullets,
-        child: new Container(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          BarrageWall(
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
+            massiveMode: false, // disabled by default
+            timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline
+            bullets: bullets,
+          ),
+        },
       ),
     )
   ],
@@ -49,7 +56,7 @@ Stack(
 
 * show barrage with send bullet function
 
-```dart
+```flutter
 Column(
   children: <Widget>[
     Expanded(
@@ -57,21 +64,26 @@ Column(
       child: Stack(
         children: <Widget>[
           Positioned(
-//                    top: 20,
+            // top: 20,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.width *
-                    MediaQuery.of(context).size.aspectRatio +
-                100,
-            child: BarrageWall(
-              debug: true, // show debug panel and logs
-              speed: 4, // speed of bullet show in screen (seconds)
-              /*
-              speed: 8,
-              speedCorrectionInMilliseconds: 3000,*/
-              /*
-                timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
-              bullets: bullets,
-              controller: barrageWallController,
+                    MediaQuery.of(context).size.aspectRatio + 100,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return BarrageWall(
+                  debug: true, // show debug panel and logs
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  speed: 4, // speed of bullet show in screen (seconds)
+                  /*
+                  speed: 8,
+                  speedCorrectionInMilliseconds: 3000,*/
+                  /*
+                  timelineNotifier: timelineNotifier, // send a BarrageValue notifier let bullet fires using your own timeline*/
+                  bullets: bullets,
+                  controller: barrageWallController,
+                );
+              },
             ),
           ),
         ],
@@ -79,14 +91,24 @@ Column(
     ),
     Expanded(
       child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextField(
+          // controller: textEditingController,
           padding: const EdgeInsets.all(8.0),
           child: TextField(
-//                    controller: textEditingController,
-              maxLength: 20,
-              onSubmitted: (text) {
-//                      textEditingController.clear();
-                barrageWallController.send([new Bullet(child: Text(text))]);
-              })),
+            // controller: textEditingController,
+            maxLength: 20,
+            onSubmitted: (text) {
+              // textEditingController.clear();
+              barrageWallController.send([new Bullet(child: Text(text))]);
+            })  maxLength: 20,
+            onSubmitted: (text) {
+              // textEditingController.clear();
+              barrageWallController.send([new Bullet(child: Text(text))]);
+            },
+          ),
+        ),
+      ),
     ),
   ],
 )

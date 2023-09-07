@@ -40,8 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     textEditingController = TextEditingController();
 
     timelineNotifier = ValueNotifier(BarrageValue());
-    videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse('https://download.samplelib.com/mp4/sample-30s.mp4'))
+    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
+        'https://video-previews.elements.envatousercontent.com/files/0a297ffd-a817-4ff3-a1e6-83972bf01b5c/video_preview_h264.mp4'))
       ..addListener(() {
         timelineNotifier.value = timelineNotifier.value.copyWith(
             timeline: videoPlayerController.value.position.inMilliseconds,
@@ -68,19 +68,22 @@ class _MyHomePageState extends State<MyHomePage> {
       showControls: false,
       autoPlay: true,
       looping: false,
-      overlay: BarrageWall(
-        debug: true,
-        // do not send bullets to the safe area
-        safeBottomHeight: 60,
-        /*
-          speed: 8,*/
-        massiveMode: false,
-        speedCorrectionInMilliseconds: 5000,
-        controller: barrageWallController,
-        /*
-          timelineNotifier: timelineNotifier,*/
-        bullets: bullets,
-      ),
+      overlay: LayoutBuilder(builder: (context, constraints) {
+        debugPrint('overlay: ${constraints.maxWidth} ${constraints.maxHeight}');
+        return BarrageWall(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          debug: false,
+          // do not send bullets to the safe area
+          safeBottomHeight: 60,
+          // speed: 8,
+          massiveMode: false,
+          speedCorrectionInMilliseconds: 5000,
+          controller: barrageWallController,
+          // timelineNotifier: timelineNotifier,
+          bullets: bullets,
+        );
+      }),
     );
   }
 

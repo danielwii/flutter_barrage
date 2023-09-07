@@ -21,8 +21,8 @@ class BarrageWall extends StatefulWidget {
   /// used to adjust speed for each channel
   final int speedCorrectionInMilliseconds;
 
-  final double? width;
-  final double? height;
+  final double width;
+  final double height;
 
   /// will not send bullets to the area is safe from bottom, default is 0
   /// used to not cover the subtitles
@@ -44,8 +44,8 @@ class BarrageWall extends StatefulWidget {
     ValueNotifier<BarrageValue>? timelineNotifier,
     this.speed = 5,
     this.child = const SizedBox(),
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
     this.massiveMode = false,
     this.maxBulletHeight = 16,
     this.debug = false,
@@ -103,13 +103,12 @@ class BulletPos {
   }
 }
 
-class _BarrageState extends State<BarrageWall>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+class _BarrageState extends State<BarrageWall> with TickerProviderStateMixin {
   late BarrageWallController _controller;
   Random _random = new Random();
-  int _processed = 0;
-  double? _width;
-  double? _height;
+  // int _processed = 0;
+  // double? _width;
+  // double? _height;
   double? _lastHeight; // 上一次计算通道个数的的高度记录
   late Timer _cleaner;
 
@@ -118,11 +117,6 @@ class _BarrageState extends State<BarrageWall>
   int? _channelMask;
   // Map<dynamic, BulletPos> _lastBullets = {};
   List<int> _speedCorrectionForChannels = [];
-
-  @override
-  didChangeMetrics() {
-    _controller.clear();
-  }
 
   int _calcSafeHeight(double height) {
     if (height.isInfinite) {
@@ -297,16 +291,12 @@ class _BarrageState extends State<BarrageWall>
 
   void handleBullets() {
     if (_controller.isEnabled && _controller.value.waitingList.isNotEmpty) {
-      if (_width == null || _height == null) {
-        return;
-      }
-
-      final recallNeeded = _lastHeight != _height || _channelMask == null;
+      final recallNeeded = _lastHeight != widget.height || _channelMask == null;
 
       if (_totalChannels == null || recallNeeded) {
-        _lastHeight = _height;
+        _lastHeight = widget.height;
         _maxBulletHeight = widget.maxBulletHeight;
-        _totalChannels = _calcSafeHeight(_height!) ~/ _maxBulletHeight!;
+        _totalChannels = _calcSafeHeight(widget.height) ~/ _maxBulletHeight!;
         debugPrint("[$TAG] total channels: ${_totalChannels! + 1}");
         _channelMask = (2 << _totalChannels!) - 1;
 
@@ -321,9 +311,9 @@ class _BarrageState extends State<BarrageWall>
       _handleBullets(
         context,
         bullets: _controller.value.waitingList,
-        width: _width!,
+        width: widget.width,
       );
-      _processed += _controller.value.waitingList.length;
+      // _processed += _controller.value.waitingList.length;
       setState(() {});
     }
   }
@@ -349,16 +339,13 @@ class _BarrageState extends State<BarrageWall>
     });
 
     super.initState();
-
-    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
+    debugPrint('[$TAG] dispose');
     _cleaner.cancel();
-    _controller.widgets.forEach((controller, widget) => controller.dispose());
+    _controller.clear();
     _controller.removeListener(handleBullets);
     if (widget.selfCreatedController) {
       _controller.dispose();
@@ -368,45 +355,31 @@ class _BarrageState extends State<BarrageWall>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (_, snapshot) {
-      _width = widget.width ?? snapshot.maxWidth;
-      _height = widget.height ?? snapshot.maxHeight;
-
-      if (widget.debug) {
-        debugPrint("[$TAG] BarrageWallValue: ${_controller.value} "
-            "TimelineNotifier: ${_controller.timelineNotifier?.value} "
-            "Timeline: ${_controller.timeline} "
-            "Bullets: ${_controller.widgets.length} "
-            "Processed: $_processed UsedChannels: ${_controller.usedChannel.toRadixString(2)} LastBullets[0]: ${_controller.lastBullets[0]}");
-      }
-      return Stack(fit: StackFit.expand, children: <Widget>[
-        widget.debug
-            ? Container(
-                color: Colors.lightBlueAccent.withOpacity(0.7),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text('BarrageWallValue: ${_controller.value}'),
-                      Text(
-                          'TimelineNotifier: ${_controller.timelineNotifier?.value}'),
-                      Text('Timeline: ${_controller.timeline}'),
-                      Text('Bullets: ${_controller.widgets.length}'),
-                      Text(
-                          'UsedChannels: ${_controller.usedChannel.toRadixString(2)}'),
-                      Text('LastBullets[0]: ${_controller.lastBullets[0]}'),
-                    ]))
-            : const SizedBox(),
-        widget.child,
-        _controller.isEnabled
-            ? Stack(
-                fit: StackFit.loose,
-                children: <Widget>[..._controller.widgets.values]
-                // ..addAll(_widgets.values ?? const SizedBox()),
-                )
-            : const SizedBox(),
-      ]);
-    });
+    return Stack(fit: StackFit.expand, children: <Widget>[
+      if (widget.debug)
+        Container(
+            color: Colors.lightBlueAccent.withOpacity(0.7),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text('BarrageWallValue: ${_controller.value}'),
+                  Text(
+                      'TimelineNotifier: ${_controller.timelineNotifier?.value}'),
+                  Text('Timeline: ${_controller.timeline}'),
+                  Text('Bullets: ${_controller.widgets.length}'),
+                  Text(
+                      'UsedChannels: ${_controller.usedChannel.toRadixString(2)}'),
+                  Text('LastBullets[0]: ${_controller.lastBullets[0]}'),
+                ])),
+      widget.child,
+      if (_controller.isEnabled)
+        Stack(
+            fit: StackFit.loose,
+            children: <Widget>[..._controller.widgets.values]
+            // ..addAll(_widgets.values ?? const SizedBox()),
+            ),
+    ]);
   }
 }
 
@@ -567,10 +540,7 @@ class BarrageWallController extends ValueNotifier<BarrageWallValue> {
   /// clear all firing bullets
   void clear() {
     /// reset all widgets animation and clear the list
-    widgets.forEach((controller, widget) {
-      controller.reset();
-      controller.dispose();
-    });
+    widgets.forEach((controller, widget) => controller.dispose());
     widgets.clear();
     // release channels
     _usedChannel = 0;
